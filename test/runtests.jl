@@ -1,5 +1,7 @@
 using SuperFastGraphs
 using Base.Test
+using LightGraphs
 
-# write your own tests here
-@test 1 == 2
+g = loadgraph("./testdata/karate.lg", "graph")
+
+@test sampleDistance(g) == 2.408199643493761
