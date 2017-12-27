@@ -3,6 +3,8 @@ module SuperFastGraphs
 using LightGraphs
 
 export sampleDistance
+export diameter!
+export ccSample
 
 function sampleDistance(g::AbstractGraph)
     numV = nv(g)
@@ -29,6 +31,58 @@ function randKVector(v::UnitRange{Int64}, k::Int64)
         kv[elem] = elem
     end
     return filter(x -> x != 0, kv)
+end
+
+# u : starting vertex
+function diameter!(g::AbstractGraph, u::Int64)
+	deg = degree_centrality(g, normalize=false)
+	# u = findmax(deg)[2]
+	dist = gdistances(g, u)
+	lb = eccentricity(g, u)
+	# println(u)
+	ub = 2 * lb
+	i = lb
+	nodeCounter = 1
+	while (ub > lb)
+		biu = lb
+		for v in vertices(g)
+			if (dist[v] == i)
+				e = eccentricity(g, v)
+				# println(nodeCounter, "  " , v)
+				# nodeCounter = nodeCounter + 1
+				if (e > biu)
+					biu = e
+				end
+				if (biu == ub)
+					break
+				end
+			end
+		end
+		if (biu > 2 * (i - 1))
+			ub = biu
+			lb = biu
+		else
+			lb = biu
+			ub = 2 * (i - 1)
+		end
+		i = i - 1
+	end
+	return ub
+end
+
+# k : sample size
+# u : vertex 
+function ccSample(g::AbstractGraph, k::Int64, u::Int64)
+    ccSample = 0
+    tempCC = 0
+    vertexSample = randKVector(vertices(g), k)
+    n = nv(g)   
+    dists = gdistances(g, u)  
+    for i in 1:length(vertexSample)
+        tempCC = tempCC + (dists[vertexSample[i]] * n)/(k*(n -1))
+    end
+    ccSample = 1 / tempCC
+    return ccSample
 end
 
 end # module
