@@ -11,3 +11,5 @@ g = loadgraph("./testdata/karate.lg", "graph")
 cc1 = closeness_centrality(g)[1]
 cc1Sample = ccSample(g, 10, 1)
 @test (cc1Sample < (cc1 + 1)) & (cc1Sample > (cc1 - 1))
+triangleNumber = triangleCounting1(g)
+@test (triangleNumber == (sum(triangles(g))/3))

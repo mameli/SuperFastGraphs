@@ -1,10 +1,13 @@
 module SuperFastGraphs
 
 using LightGraphs
+using Combinatorics
 
 export sampleDistance
 export diameter!
 export ccSample
+export triangleCounting
+export triangleCounting1
 
 function sampleDistance(g::AbstractGraph)
     numV = nv(g)
@@ -84,5 +87,38 @@ function ccSample(g::AbstractGraph, k::Int64, u::Int64)
     ccSample = 1 / tempCC
     return ccSample
 end
+
+
+
+
+function triangleCounting(g::AbstractGraph)
+	triangleNumber = 0
+	for v in vertices(g)
+		for element in combinations(neighbors(g, v), 2)
+			if ((degree(g, v) < degree(g, element[1]) | degree(g, v) < degree(g, element[2])) & has_edge(g, element[1], element[2]))
+				triangleNumber = triangleNumber + 1
+			end
+		end
+	end
+	return triangleNumber
+end
+
+function triangleCounting1(g::AbstractGraph)
+	triangleNumber = 0
+	for v in vertices(g)
+		vNeighbors = neighbors(g, v)
+		for u in vNeighbors
+			if (degree(g, v) < degree(g, u))
+				for w in vNeighbors
+					if ((degree(g, v) < degree(g, w)) & has_edge(g, u, w))
+						triangleNumber = triangleNumber + 1
+					end
+				end
+			end
+		end
+	end
+	return triangleNumber
+end
+
 
 end # module
