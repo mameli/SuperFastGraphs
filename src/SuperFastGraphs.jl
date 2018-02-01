@@ -109,7 +109,7 @@ function triangleCounting(g::AbstractGraph)
 				end
 			end
 		end
-    	return triangleNumber
+    	return triangleNumber/3
 end
 
 function triangleCountingDegree(g::AbstractGraph)
