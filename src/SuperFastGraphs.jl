@@ -1,7 +1,6 @@
 module SuperFastGraphs
 
 using LightGraphs
-using Combinatorics
 
 export sampleDistance
 export diameter!
