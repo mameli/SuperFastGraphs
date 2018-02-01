@@ -7,7 +7,7 @@ export sampleDistance
 export diameter!
 export ccSample
 export triangleCounting
-export triangleCounting1
+export triangleCountingDegree
 
 function sampleDistance(g::AbstractGraph)
     numV = nv(g)
@@ -38,39 +38,39 @@ end
 
 # u : starting vertex
 function diameter!(g::AbstractGraph, u::Int64)
-	deg = degree_centrality(g, normalize=false)
+    	deg = degree_centrality(g, normalize=false)
 	# u = findmax(deg)[2]
-	dist = gdistances(g, u)
-	lb = eccentricity(g, u)
+    	dist = gdistances(g, u)
+    	lb = eccentricity(g, u)
 	# println(u)
-	ub = 2 * lb
-	i = lb
-	nodeCounter = 1
-	while (ub > lb)
-		biu = lb
-		for v in vertices(g)
-			if (dist[v] == i)
-				e = eccentricity(g, v)
+    	ub = 2 * lb
+    	i = lb
+    	nodeCounter = 1
+    	while (ub > lb)
+        		biu = lb
+        		for v in vertices(g)
+            			if (dist[v] == i)
+                				e = eccentricity(g, v)
 				# println(nodeCounter, "  " , v)
 				# nodeCounter = nodeCounter + 1
-				if (e > biu)
-					biu = e
-				end
-				if (biu == ub)
-					break
-				end
-			end
-		end
-		if (biu > 2 * (i - 1))
-			ub = biu
-			lb = biu
-		else
-			lb = biu
-			ub = 2 * (i - 1)
-		end
-		i = i - 1
-	end
-	return ub
+                				if (e > biu)
+                    					biu = e
+                				end
+                				if (biu == ub)
+                    					break
+                				end
+            			end
+        		end
+        		if (biu > 2 * (i - 1))
+            			ub = biu
+            			lb = biu
+        		else
+            			lb = biu
+            			ub = 2 * (i - 1)
+        		end
+        		i = i - 1
+    	end
+    	return ub
 end
 
 # k : sample size
@@ -82,7 +82,7 @@ function ccSample(g::AbstractGraph, k::Int64, u::Int64)
     n = nv(g)   
     dists = gdistances(g, u)  
     for i in 1:length(vertexSample)
-        tempCC = tempCC + (dists[vertexSample[i]] * n)/(k*(n -1))
+        tempCC = tempCC + (dists[vertexSample[i]] * n) / (k * (n - 1))
     end
     ccSample = 1 / tempCC
     return ccSample
@@ -92,31 +92,53 @@ end
 
 
 function triangleCounting(g::AbstractGraph)
-	triangleNumber = 0
-	for v in vertices(g)
-		for element in combinations(neighbors(g, v), 2)
-			if ((degree(g, v) < degree(g, element[1]) | degree(g, v) < degree(g, element[2])) & has_edge(g, element[1], element[2]))
-				triangleNumber = triangleNumber + 1
-			end
-		end
-	end
-	return triangleNumber
-end
-
-function triangleCounting1(g::AbstractGraph)
-	triangleNumber = 0
-	for v in vertices(g)
-		vNeighbors = neighbors(g, v)
-		for u in vNeighbors
-			if (degree(g, v) < degree(g, u))
+		triangleNumber = 0
+		# t = zeros(Int64, nv(g))
+		# listT = Set()
+    	for v in vertices(g)
+			vNeighbors = neighbors(g, v)
+			for u in vNeighbors
 				for w in vNeighbors
-					if ((degree(g, v) < degree(g, w)) & has_edge(g, u, w))
+					if (u < w && has_edge(g, u, w))
 						triangleNumber = triangleNumber + 1
+						# t[v] = t[v] + 1
+						# t[u] = t[u] + 1
+						# t[w] = t[w] + 1
+						# # println("triangolo tra ", sort([v,w,u]))
+						# push!(listT, sort([v,w,u]))
 					end
 				end
 			end
 		end
+    	return triangleNumber
+end
+
+function triangleCountingDegree(g::AbstractGraph)
+	# listT = triangleCounting(g)
+	triangleNumber = 0
+	# t = zeros(Int64, nv(g))
+	# listT2 = Set()
+	for v in vertices(g)
+		vNeighbors = neighbors(g, v)
+		# println("Vicini di ", v, ":", vNeighbors)
+		for u in vNeighbors
+			if (degree(g, v) < degree(g, u) || ((degree(g, v) == degree(g, u) && v < u)))		
+				for w in vNeighbors
+		    	    if (w < u && (degree(g, v) < degree(g, w) || ((degree(g, v) == degree(g, w) && v < w))) && has_edge(g, u, w))
+						triangleNumber = triangleNumber + 1
+						# t[v] = t[v] + 1
+						# t[u] = t[u] + 1
+						# t[w] = t[w] + 1
+						# println("triangolo tra ", sort([v,w,u]))
+						# push!(listT2, sort([v,w,u]))
+		    	    end
+		    	end
+			end
+		end
 	end
+	# println(t)
+	# println(setdiff(listT, listT2))
+	# println(triangleNumber)
 	return triangleNumber
 end
 
