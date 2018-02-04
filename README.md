@@ -7,7 +7,7 @@
 | Distance            | :heavy_check_mark:    |:heavy_check_mark:|
 | Distance with prob  | :x:                   |:heavy_check_mark:|
 | Diameter            | :heavy_check_mark:    |:heavy_check_mark:|
-| Diameter fringe bfs | :x:                   |:heavy_check_mark:|
+| ifub                | :x:                   |:heavy_check_mark:|
 | Closeness Centrality| :heavy_check_mark:    |:heavy_check_mark:|
 | CC with Sampling    | :x:                   |:heavy_check_mark:|
 | CC pruned bfs       | :x:                   |:construction:    |
