@@ -10,10 +10,10 @@ export triangleCounting
 export triangleCountingDegree
 export prunedBFS
 
-function sampleDistance(g::AbstractGraph)
+function sampleDistance(g::AbstractGraph, precision::Int64 )
 	numV = nv(g)
 	distApp = 0
-	k = convert(Int64, floor(log(numV) * 1000)) # 100 per precisione allo 0.1
+	k = convert(Int64, floor(log(numV) * precision)) # precision = 100 per precisione allo 0.1
 	k = k < numV ? k : numV # il sottoinsieme preso puo essere al massimo grande quanto quello originale
 	vertexSample = randKVector(vertices(g), k)
 	
@@ -75,7 +75,7 @@ function diameter!(g::AbstractGraph, u::Int64)
 end
 
 # k : sample size
-# u : vertex 
+# u : vertex for cc
 function ccSample(g::AbstractGraph, k::Int64, u::Int64)
 	ccSample = 0
 	tempCC = 0
@@ -140,7 +140,7 @@ function triangleCountingDegree(g::AbstractGraph)
 	end
 	# println(t)
 	# println(setdiff(listT, listT2))
-	println(triangleNumber)
+	# println(triangleNumber)
 	return triangleNumber
 end
 

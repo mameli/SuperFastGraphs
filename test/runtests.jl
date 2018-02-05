@@ -30,7 +30,7 @@ add_edge!(g, 4, 5)
 
 g = loadgraph("./testdata/karate.lg", "graph")
 
-@test sampleDistance(g) == 2.408199643493761
+@test sampleDistance(g, 1000) == 2.408199643493761
 
 @test diameter!(g, 1) == 5
 
