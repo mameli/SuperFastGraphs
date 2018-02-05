@@ -11,14 +11,17 @@ add_edge!(g, 5, 1)
 add_edge!(g, 2, 3)
 add_edge!(g, 3, 6)
 add_edge!(g, 4, 5)
-print(preProcess(g))
+println(preProcess(g))
+
 println("-----------------")
 g = DiGraph(3)
 add_edge!(g, 1, 2)
 add_edge!(g, 2, 3)
 add_edge!(g, 3, 1)
 println(preProcess(g))
+
 println("---------------")
+
 g = Graph(6)
 add_edge!(g, 1, 2)
 add_edge!(g, 1, 3)

@@ -217,20 +217,21 @@ function preProcess(g::AbstractGraph) #preprocess for compute upper boud of clos
 		ccg = strongly_connected_components(g)
 		condensationGraph = condensation(g)
 		ccDAGTopologicalSorted = topological_sort_by_dfs(condensationGraph)
-		ccgTopologicalSorted = []
-		for i in ccDAGTopologicalSorted
-			push!(ccgTopologicalSorted, ccg[i])
-		end
-		println(ccgTopologicalSorted)
+		ccgTopologicalSorted = Array{Array{Int64}}(length(ccg))
+
 		alpha = zeros(Int64, length(ccDAGTopologicalSorted))
 		omega = zeros(Int64, length(ccDAGTopologicalSorted))
-		omega[end] = length(ccgTopologicalSorted[end])
-		alpha[end] = length(ccgTopologicalSorted[end])
+		c = ccg[ccDAGTopologicalSorted[end]]
+		omega[end] = length(c)
+		alpha[end] = length(c)
 		maxAlpha = alpha[end]
-		for i in length(ccgTopologicalSorted)-1:-1:1 #dynamic programming
-			println(i,": ",ccgTopologicalSorted[i]," -> ", length(ccgTopologicalSorted[i]))
-			omega[i] = length(ccgTopologicalSorted[i])+sum(omega)
-			alpha[i] = maxAlpha + length(ccgTopologicalSorted[i])
+		ccgTopologicalSorted[end] = c
+		for i in length(ccg)-1:-1:1 #dynamic programming
+			c = ccg[ccDAGTopologicalSorted[i]]
+			# println(i,": ",c," -> ", length(c))
+			ccgTopologicalSorted[i] = c
+			omega[i] = length(c)+sum(omega)
+			alpha[i] = maxAlpha + length(c)
 			if (alpha[i] > maxAlpha)
 				maxAlpha = alpha[i]
 			end
