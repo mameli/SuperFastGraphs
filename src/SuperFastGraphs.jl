@@ -9,6 +9,7 @@ export ccSample
 export triangleCounting
 export triangleCountingDegree
 export prunedBFS
+export preProcess
 
 function sampleDistance(g::AbstractGraph, precision::Int64 )
 	numV = nv(g)
@@ -157,9 +158,10 @@ function prunedBFS(g::AbstractGraph, v::Int64, x::Int64, preProcessData )
 	fdValue = 0
 	nodeExplored = 0
 	ccV = 1
-	# while v !in preProcessData[ccV] #trovo la componente connessa di v
-		# ccV++
-	# end
+	while !in(v, preProcessData[ccV]) #trovo la componente connessa di v
+		ccV = ccV + 1
+	end
+
 	while length(q)>0
 		e = dequeue!(q)
 		push!(nodeAtDepth, e)
@@ -176,8 +178,8 @@ function prunedBFS(g::AbstractGraph, v::Int64, x::Int64, preProcessData )
 			for node in nodeAtDepth
 			    gamma_d1 = gamma_d1 + degree(node)
 			end
-			bound = max( ((preprocess[2][ccV]-1)^2)/(fdValue - gamma_d1 + (depth +2)*( preprocess[2][ccV]- nodeExplored)) ,
-						 ((preprocess[3][ccV]-1)^2)/(fdValue - gamma_d1 + (depth +2)*( preprocess[3][ccV]- nodeExplored))
+			bound = max( ((preProcessData[2][ccV]-1)^2)/(fdValue - gamma_d1 + (depth +2)*( preProcessData[2][ccV]- nodeExplored)) ,
+						 ((preProcessData[3][ccV]-1)^2)/(fdValue - gamma_d1 + (depth +2)*( preProcessData[3][ccV]- nodeExplored))
 						) / (n-1)
 			if x > bound
 				return 0 #il nodo non è tra i topk
@@ -205,28 +207,35 @@ function preProcess(g::AbstractGraph) #preprocess for compute upper boud of clos
 	elseif (!is_directed(g) && is_connected(g))
 		return ([collect(vertices(g))], [nv(g)], [nv(g)])
 	elseif (!is_directed(g) && !is_connected(g))
-		ccg = connectedComponents(g)
+		ccg = connected_components(g)
 		lenccg = Int64[]
 		for cc in ccg
 			push!(lenccg, length(cc))
 		end
 		return (ccg, lenccg, lenccg)
 	elseif (is_directed(g) && !is_strongly_connected(g) && is_weakly_connected(g))
-		ccg = connectedComponents(g)
-		ccDAGTopologicalSorted = topological_sort_by_dfs(condensation(g))
+		ccg = strongly_connected_components(g)
+		condensationGraph = condensation(g)
+		ccDAGTopologicalSorted = topological_sort_by_dfs(condensationGraph)
+		ccgTopologicalSorted = []
+		for i in ccDAGTopologicalSorted
+			push!(ccgTopologicalSorted, ccg[i])
+		end
+		println(ccgTopologicalSorted)
 		alpha = zeros(Int64, length(ccDAGTopologicalSorted))
 		omega = zeros(Int64, length(ccDAGTopologicalSorted))
-		omega[end] = length(ccg[end])
-		alpha[end] = length(ccg[end])
+		omega[end] = length(ccgTopologicalSorted[end])
+		alpha[end] = length(ccgTopologicalSorted[end])
 		maxAlpha = alpha[end]
-		for i in length(ccDAGTopologicalSorted)-1:1 #dynamic programming
-			omega[i] = length(ccg[i])+omega[i+1]
-			alpha[i] = maxAlpha + length(ccg[i])
+		for i in length(ccgTopologicalSorted)-1:-1:1 #dynamic programming
+			println(i,": ",ccgTopologicalSorted[i]," -> ", length(ccgTopologicalSorted[i]))
+			omega[i] = length(ccgTopologicalSorted[i])+sum(omega)
+			alpha[i] = maxAlpha + length(ccgTopologicalSorted[i])
 			if (alpha[i] > maxAlpha)
 				maxAlpha = alpha[i]
 			end
 		end
-		return (ccg, alpha, omega)
+		return (ccgTopologicalSorted, alpha, omega)
 	end
 end
 
@@ -241,7 +250,7 @@ function fastClosenessCentrality(g::AbstractGraph)
     		push!(topk, v)
     	end
     end
-    #TODO: order by degree
+	#TODO: order by degree
 end
 
 end # module
