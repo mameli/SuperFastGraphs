@@ -131,6 +131,7 @@ function triangleCountingDegree(g::AbstractGraph)
 						# t[u] = t[u] + 1
 						# t[w] = t[w] + 1
 						# println("triangolo tra ", sort([v,w,u]))
+						# println("nodo scelto ", v)
 						# push!(listT2, sort([v,w,u]))
 					end
 				end
@@ -139,12 +140,11 @@ function triangleCountingDegree(g::AbstractGraph)
 	end
 	# println(t)
 	# println(setdiff(listT, listT2))
-	# println(triangleNumber)
+	println(triangleNumber)
 	return triangleNumber
 end
 
 function prunedBFS(g::AbstractGraph, v::Int64, x::Int64, preProcessData )
-
 	q = Queue(Int64)
 	visited = zeros(Int64, nv(g)) #0: not visited, 1:visited, 2:completely explored
 	enqueue!(q, v)
@@ -157,9 +157,9 @@ function prunedBFS(g::AbstractGraph, v::Int64, x::Int64, preProcessData )
 	fdValue = 0
 	nodeExplored = 0
 	ccV = 1
-	while v !in preProcessData[ccV] #trovo la componente connessa di v
-		ccV++
-	end
+	# while v !in preProcessData[ccV] #trovo la componente connessa di v
+		# ccV++
+	# end
 	while length(q)>0
 		e = dequeue!(q)
 		push!(nodeAtDepth, e)
@@ -169,7 +169,7 @@ function prunedBFS(g::AbstractGraph, v::Int64, x::Int64, preProcessData )
 		timeToDepthIncrease = timeToDepthIncrease - 1
 		if timeToDepthIncrease == 0
 			#computing bound
-			n = len(vertices(g))
+			n = length(vertices(g))
 			fdValue = fdValue + (length(nodeAtDepth)*depth)
 			nodeExplored = nodeExplored + length(nodeAtDepth)
 			gamma_d1 = 0
@@ -178,8 +178,7 @@ function prunedBFS(g::AbstractGraph, v::Int64, x::Int64, preProcessData )
 			end
 			bound = max( ((preprocess[2][ccV]-1)^2)/(fdValue - gamma_d1 + (depth +2)*( preprocess[2][ccV]- nodeExplored)) ,
 						 ((preprocess[3][ccV]-1)^2)/(fdValue - gamma_d1 + (depth +2)*( preprocess[3][ccV]- nodeExplored))
-						) 
-						/ (n-1)
+						) / (n-1)
 			if x > bound
 				return 0 #il nodo non è tra i topk
 			end

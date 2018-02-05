@@ -18,6 +18,16 @@ using LightGraphs
 # # add_edge!(g, 4, 5)
 # # add_edge!(g, 8, 9)
 
+g = Graph(6)
+
+add_edge!(g, 1, 2)
+add_edge!(g, 1, 3)
+add_edge!(g, 1, 4)
+add_edge!(g, 1, 5)
+add_edge!(g, 2, 3)
+add_edge!(g, 3, 6)
+add_edge!(g, 4, 5)
+
 g = loadgraph("./testdata/karate.lg", "graph")
 
 @test sampleDistance(g) == 2.408199643493761
