@@ -2,6 +2,7 @@ module SuperFastGraphs
 
 using LightGraphs
 using DataStructures
+# using Collections 
 
 export sampleDistance
 export diameter!
@@ -146,7 +147,7 @@ function triangleCountingDegree(g::AbstractGraph)
 	return triangleNumber
 end
 
-function prunedBFS(g::AbstractGraph, v::Int64, x::Float64, preProcessData )
+function prunedBFS(g::AbstractGraph, v::Int64, x::Float64, preProcessData)
 	q = Queue(Int64)
 	visited = zeros(Int64, nv(g)) #0: not visited, 1:visited, 2:completely explored
 	enqueue!(q, v)
@@ -265,26 +266,41 @@ function preProcess(g::AbstractGraph) #preprocess for compute upper boud of clos
 	end
 end
 
-function fastClosenessCentrality(g::AbstractGraph)
+function fastClosenessCentrality(g::AbstractGraph, k::Int64)
 	preprocessData = preProcess(g)
 	println("Dati PreProcess: ", preprocessData)
 	xk = 0.0
 	topk = []
-	vrtx = vertices(g)
-	vrtx = vrtx[end:-1:1,end:-1:1]
+	counter = 0
 	for v in vertices(g)
 		if (degree(g, v) != 0)
 			t_xk = prunedBFS(g, v, xk, preprocessData)
 			#t_xk = prunedBFS(g, v, 0.0, preprocessData)
 			println(v," --- analizzato --->", t_xk)
 			if t_xk != 0
-				xk = t_xk
-				push!(topk, (v, xk))
-				println(v," --- trovato top k --->", xk)
+				if (counter < k)
+					if (counter == 1)
+						xk = t_xk
+					end
+					if (xk > t_xk)
+						xk = t_xk
+						println("valore di xk piu piccolo ", xk)
+					end
+					counter = counter + 1
+					push!(topk, (t_xk, v))
+					println(v," --- trovato top k --->", t_xk)
+				end
+				if (counter == k && xk < t_xk)
+					deleteat!(topk, indmin(topk))
+					xk = minimum(topk)[1]
+					println("valore di xk piu piccolo ", xk)
+					push!(topk, (t_xk, v))
+					println(v," --- trovato top k --->", t_xk)
+				end
 			end
 		end
 	end
-	return topk
+	return sort!(topk, by= x->-x[1])
 end
 
 end # module
