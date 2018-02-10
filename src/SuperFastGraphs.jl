@@ -2,7 +2,6 @@ module SuperFastGraphs
 
 using LightGraphs
 using DataStructures
-# using Collections 
 
 export sampleDistance
 export diameter!
@@ -108,7 +107,7 @@ function triangleCounting(g::AbstractGraph)
 						# t[v] = t[v] + 1
 						# t[u] = t[u] + 1
 						# t[w] = t[w] + 1
-						# # println("triangolo tra ", sort([v,w,u]))
+						# println("triangolo tra ", sort([v,w,u]))
 						# push!(listT, sort([v,w,u]))
 					end
 				end
@@ -164,7 +163,7 @@ function prunedBFS(g::AbstractGraph, v::Int64, x::Float64, preProcessData)
 	while !in(v, preProcessData[1][ccV]) #trovo la componente connessa di v
 		ccV = ccV + 1
 	end
-	println("---VERTICE ", v,": ")
+	# println("---VERTICE ", v,": ")
 	while length(q)>0
 		e = dequeue!(q)
 		push!(nodeAtDepth, e)
@@ -182,21 +181,21 @@ function prunedBFS(g::AbstractGraph, v::Int64, x::Float64, preProcessData)
 
 			fdTildeValueAlpha = fdValue - gamma_d1 + (depth+2)*(preProcessData[2][ccV] - nodeExplored)
 			fdTildeValueOmega = fdValue - gamma_d1 + (depth+2)*(preProcessData[2][ccV] - nodeExplored)
-			println("R(V): ", preProcessData[2][ccV])
+			# println("R(V): ", preProcessData[2][ccV])
 			a = ((preProcessData[2][ccV]-1)^2) / fdTildeValueAlpha
 			b = ((preProcessData[3][ccV]-1)^2) / fdTildeValueOmega
 			bound = max( a, b ) / (n-1)
-			println("fdValue: ",fdValue)
-			println("n_d: ", nodeExplored)
-			println("gamma_d1: ",gamma_d1)
-			println("depth: ", depth)
-			println("bound: ", bound)
-			println("fdtilde: ",fdTildeValueAlpha, " ", fdTildeValueOmega)
+			# println("fdValue: ",fdValue)
+			# println("n_d: ", nodeExplored)
+			# println("gamma_d1: ",gamma_d1)
+			# println("depth: ", depth)
+			# println("bound: ", bound)
+			# println("fdtilde: ",fdTildeValueAlpha, " ", fdTildeValueOmega)
 			if bound < 0
-				println("AAAAAALJQWGRHOQWOGQWEGOPIWQEJGOIWQEJGOQWEIGJ QWEO IGJWQEOGWQBEOPGIQWJE GOPQWEGOPWQEGIJQWEGIQWEGPOQWEGIJWEOGQWJEOPGQWE")
+				# println("BOUND MINORE DI ZERO BOUND MINORE DI ZERO BOUND MINORE DI ZERO BOUND MINORE DI ZERO BOUND MINORE DI ZERO ")
 			end
 			if (x > bound )
-				println("v: ", v, " bound: ", bound, " NON TOPK")
+				# println("v: ", v, " bound: ", bound, " NON TOPK")
 				return 0 #il nodo non è tra i topk
 			end
 			#
@@ -217,12 +216,12 @@ function prunedBFS(g::AbstractGraph, v::Int64, x::Float64, preProcessData)
 		end
 	end
 
-	println("RITORNO VALORE->")
-	println("fvalue: ", fdValue)
-	println("rv: ", preProcessData[1][ccV])
+	# println("RITORNO VALORE->")
+	# println("fvalue: ", fdValue)
+	# println("rv: ", preProcessData[1][ccV])
 	d = dijkstra_shortest_paths(g,v).dists
 	δ = filter(x->x != typemax(x), d)
-	println("PreProcess[1][", ccV,"]: ", preProcessData[1][ccV])
+	# println("PreProcess[1][", ccV,"]: ", preProcessData[1][ccV])
 	#return ((length(preProcessData[1][ccV]) - 1 )^2)/((nv(g)-1)*sum(δ))
 	return ((length(d) - 1 )^2)/((nv(g)-1)*sum(δ))
 end
@@ -268,39 +267,44 @@ end
 
 function fastClosenessCentrality(g::AbstractGraph, k::Int64)
 	preprocessData = preProcess(g)
-	println("Dati PreProcess: ", preprocessData)
+	# println("Dati PreProcess: ", preprocessData)
 	xk = 0.0
-	topk = []
-	counter = 0
+	topK = PriorityQueue{Int64,Float64}()
 	for v in vertices(g)
 		if (degree(g, v) != 0)
 			t_xk = prunedBFS(g, v, xk, preprocessData)
 			#t_xk = prunedBFS(g, v, 0.0, preprocessData)
-			println(v," --- analizzato --->", t_xk)
+			# println(v," --- analizzato --->", t_xk)
 			if t_xk != 0
-				if (counter < k)
-					if (counter == 1)
-						xk = t_xk
+				if (length(topK) < k)
+					enqueue!(topK, v, t_xk)
+					# println(topK)
+					# println(v," --- trovato top k --->", t_xk)
+					if length(topK) == k
+						xk = peek(topK)[2]
+						# println("valore di xk piu piccolo con coda piena ", xk)
 					end
-					if (xk > t_xk)
-						xk = t_xk
-						println("valore di xk piu piccolo ", xk)
-					end
-					counter = counter + 1
-					push!(topk, (t_xk, v))
-					println(v," --- trovato top k --->", t_xk)
-				end
-				if (counter == k && xk < t_xk)
-					deleteat!(topk, indmin(topk))
-					xk = minimum(topk)[1]
-					println("valore di xk piu piccolo ", xk)
-					push!(topk, (t_xk, v))
-					println(v," --- trovato top k --->", t_xk)
+				elseif (length(topK) == k && peek(topK)[2] < t_xk)
+					dequeue!(topK)
+					enqueue!(topK, v, t_xk)
+					xk = peek(topK)[2]
+					# println("valore di xk piu piccolo con dequeue ", xk)
+					# println(topK)
+					# println(v," --- trovato top k --->", t_xk)
 				end
 			end
 		end
 	end
-	return sort!(topk, by= x->-x[1])
+	return priorityQueueToList(topK)
+end
+
+function priorityQueueToList(q::PriorityQueue)
+	list = []
+	for i in 1:length(q)
+		push!(list,  peek(q))
+		dequeue!(q)
+	end
+	return list
 end
 
 end # module

@@ -42,3 +42,7 @@ triangleNumber = triangleCounting(g)
 triangleNumberD = triangleCountingDegree(g)
 @test (triangleNumber == (sum(triangles(g))/3))
 @test (triangleNumberD == (sum(triangles(g))/3))
+
+
+@test ((sort!(closeness_centrality(g)))[end] == fastClosenessCentrality(g, 1)[1][2])
+@test ((sort!(closeness_centrality(g)))[end - 5] == fastClosenessCentrality(g, 5)[1][2])
