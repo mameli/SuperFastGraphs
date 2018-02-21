@@ -33,6 +33,8 @@ g = loadgraph("./testdata/karate.lg", "graph")
 @test sampleDistance(g, 1000) == 2.408199643493761
 
 @test iFub(g, 1) == 5
+@test iFub(g) == 5
+
 
 cc1 = closeness_centrality(g)[1]
 cc1Sample = ccSample(g, 10, 1)
@@ -69,5 +71,5 @@ add_edge!(gNotD_NotC, 5, 4)
 @test preProcess(gNotD_NotC) == ([[1, 2, 3, 4, 5], [6]], [5, 1], [5, 1])
 
 ## TEST FASTCLOSENESSCENTRALITY
-@test ((sort!(closeness_centrality(g)))[end] == fastClosenessCentrality(g, 1)[1][2])
-@test ((sort!(closeness_centrality(g)))[end - 5] == fastClosenessCentrality(g, 5)[1][2])
+@test ((sort!(closeness_centrality(g)))[end] == topKcc(g, 1)[1][2])
+@test ((sort!(closeness_centrality(g)))[end - 5] == topKcc(g, 5)[1][2])

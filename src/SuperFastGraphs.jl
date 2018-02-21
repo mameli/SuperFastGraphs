@@ -10,7 +10,7 @@ export triangleCounting
 export triangleCountingDegree
 export prunedBFS
 export preProcess
-export fastClosenessCentrality
+export topKcc
 
 function sampleDistance(g::AbstractGraph, precision::Int64 )
 	numV = nv(g)
@@ -37,6 +37,10 @@ function randKVector(v::UnitRange{Int64}, k::Int64)
 		kv[elem] = elem
 	end
 	return filter(x -> x != 0, kv)
+end
+
+function iFub(g::AbstractGraph)
+	return iFub(g, findmax(degree_centrality(g, normalize=false))[2])
 end
 
 # u : starting vertex
@@ -265,7 +269,7 @@ function preProcess(g::AbstractGraph) #preprocess for compute upper boud of clos
 	end
 end
 
-function fastClosenessCentrality(g::AbstractGraph, k::Int64)
+function topKcc(g::AbstractGraph, k::Int64)
 	preprocessData = preProcess(g)
 	# println("Dati PreProcess: ", preprocessData)
 	xk = 0.0
