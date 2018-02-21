@@ -32,7 +32,7 @@ g = loadgraph("./testdata/karate.lg", "graph")
 
 @test sampleDistance(g, 1000) == 2.408199643493761
 
-@test diameter!(g, 1) == 5
+@test iFub(g, 1) == 5
 
 cc1 = closeness_centrality(g)[1]
 cc1Sample = ccSample(g, 10, 1)

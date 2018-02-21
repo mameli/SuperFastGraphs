@@ -4,7 +4,7 @@ using LightGraphs
 using DataStructures
 
 export sampleDistance
-export diameter!
+export iFub
 export ccSample
 export triangleCounting
 export triangleCountingDegree
@@ -40,7 +40,7 @@ function randKVector(v::UnitRange{Int64}, k::Int64)
 end
 
 # u : starting vertex
-function diameter!(g::AbstractGraph, u::Int64)
+function iFub(g::AbstractGraph, u::Int64)
 		deg = degree_centrality(g, normalize=false)
 	# u = findmax(deg)[2]
 		dist = gdistances(g, u)
