@@ -40,10 +40,7 @@ cc1 = closeness_centrality(g)[1]
 cc1Sample = ccSample(g, 10, 1)
 @test (cc1Sample < (cc1 + 1)) & (cc1Sample > (cc1 - 1))
 
-triangleNumber = triangleCounting(g)
-triangleNumberD = triangleCountingDegree(g)
-@test (triangleNumber == (sum(triangles(g))/3))
-@test (triangleNumberD == (sum(triangles(g))/3))
+@test (triangleCountingDegree(g) == triangles(g))
 
 ## TEST PREPROCESS
 gDWeakly = DiGraph(6)

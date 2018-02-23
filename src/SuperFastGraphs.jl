@@ -96,30 +96,6 @@ function ccSample(g::AbstractGraph, k::Int64, u::Int64)
 end
 
 
-
-
-function triangleCounting(g::AbstractGraph)
-		triangleNumber = 0
-		# t = zeros(Int64, nv(g))
-		# listT = Set()
-		for v in vertices(g)
-			vNeighbors = neighbors(g, v)
-			for u in vNeighbors
-				for w in vNeighbors
-					if (u < w && has_edge(g, u, w))
-						triangleNumber = triangleNumber + 1
-						# t[v] = t[v] + 1
-						# t[u] = t[u] + 1
-						# t[w] = t[w] + 1
-						# println("triangolo tra ", sort([v,w,u]))
-						# push!(listT, sort([v,w,u]))
-					end
-				end
-			end
-		end
-		return triangleNumber/3
-end
-
 function triangleCountingDegree(g::AbstractGraph)
 	triangleNumber = 0
 	t = zeros(Int64, nv(g))
