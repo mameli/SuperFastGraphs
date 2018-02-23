@@ -121,9 +121,8 @@ function triangleCounting(g::AbstractGraph)
 end
 
 function triangleCountingDegree(g::AbstractGraph)
-	# listT = triangleCounting(g)
 	triangleNumber = 0
-	# t = zeros(Int64, nv(g))
+	t = zeros(Int64, nv(g))
 	# listT2 = Set()
 	for v in vertices(g)
 		vNeighbors = neighbors(g, v)
@@ -133,9 +132,9 @@ function triangleCountingDegree(g::AbstractGraph)
 				for w in vNeighbors
 					if (w < u && (degree(g, v) < degree(g, w) || ((degree(g, v) == degree(g, w) && v < w))) && has_edge(g, u, w))
 						triangleNumber = triangleNumber + 1
-						# t[v] = t[v] + 1
-						# t[u] = t[u] + 1
-						# t[w] = t[w] + 1
+						t[v] = t[v] + 1
+						t[u] = t[u] + 1
+						t[w] = t[w] + 1
 						# println("triangolo tra ", sort([v,w,u]))
 						# println("nodo scelto ", v)
 						# push!(listT2, sort([v,w,u]))
@@ -147,7 +146,7 @@ function triangleCountingDegree(g::AbstractGraph)
 	# println(t)
 	# println(setdiff(listT, listT2))
 	# println(triangleNumber)
-	return triangleNumber
+	return t
 end
 
 function prunedBFS(g::AbstractGraph, v::Int64, x::Float64, preProcessData)

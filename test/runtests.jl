@@ -73,3 +73,5 @@ add_edge!(gNotD_NotC, 5, 4)
 ## TEST FASTCLOSENESSCENTRALITY
 @test ((sort!(closeness_centrality(g)))[end] == topKcc(g, 1)[1][2])
 @test ((sort!(closeness_centrality(g)))[end - 5] == topKcc(g, 5)[1][2])
+
+## TEST TRIANGLE COUNTING
