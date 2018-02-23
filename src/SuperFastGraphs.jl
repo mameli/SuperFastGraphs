@@ -6,7 +6,6 @@ using DataStructures
 export sampleDistance
 export iFub
 export ccSample
-export triangleCounting
 export triangleCountingDegree
 export prunedBFS
 export preProcess
@@ -45,8 +44,6 @@ end
 
 # u : starting vertex
 function iFub(g::AbstractGraph, u::Int64)
-		deg = degree_centrality(g, normalize=false)
-	# u = findmax(deg)[2]
 		dist = gdistances(g, u)
 		lb = eccentricity(g, u)
 	# println(u)
@@ -99,28 +96,26 @@ end
 function triangleCountingDegree(g::AbstractGraph)
 	triangleNumber = 0
 	t = zeros(Int64, nv(g))
-	# listT2 = Set()
+	dv, du, dw = 0, 0, 0
 	for v in vertices(g)
 		vNeighbors = neighbors(g, v)
-		# println("Vicini di ", v, ":", vNeighbors)
+		dv = degree(g, v)
 		for u in vNeighbors
-			if (degree(g, v) < degree(g, u) || ((degree(g, v) == degree(g, u) && v < u)))		
+			du = degree(g, u)
+			if (dv < du || ((dv == du && v < u)))		
 				for w in vNeighbors
-					if (w < u && (degree(g, v) < degree(g, w) || ((degree(g, v) == degree(g, w) && v < w))) && has_edge(g, u, w))
+					dw = degree(g, w)
+					if (w < u && (dv < dw || ((dv == dw && v < w))) && has_edge(g, u, w))
 						triangleNumber = triangleNumber + 1
 						t[v] = t[v] + 1
 						t[u] = t[u] + 1
 						t[w] = t[w] + 1
-						# println("triangolo tra ", sort([v,w,u]))
-						# println("nodo scelto ", v)
-						# push!(listT2, sort([v,w,u]))
 					end
 				end
 			end
 		end
 	end
 	# println(t)
-	# println(setdiff(listT, listT2))
 	# println(triangleNumber)
 	return t
 end

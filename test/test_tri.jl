@@ -2,16 +2,15 @@ using SuperFastGraphs
 using Base.Test
 using LightGraphs
 
-g = loadgraph("./testdata/internet.lg", "graph")
-
+# g = loadgraph("./testdata/barabasi_example.lg", "graph")
+g = loadgraph("./testdata/karate.lg", "graph")
+g = barabasi_albert(10000, 30)
 tic()
 t = triangles(g)
 toc()
-tic()
-triangleNumber = triangleCounting(g)
-toc()
+
 tic()
 triangleNumberD = triangleCountingDegree(g)
 toc()
-println(triangleNumber == (sum(triangles(g))/3))
-println(triangleNumberD == (sum(triangles(g))/3))
+
+println(triangleNumberD == triangles(g))
