@@ -4,7 +4,9 @@ using LightGraphs
 
 # g = loadgraph("./testdata/barabasi_example.lg", "graph")
 g = loadgraph("./testdata/karate.lg", "graph")
-g = barabasi_albert(10000, 30)
+g = loadgraph("./testdata/internet.lg", "graph")
+g = barabasi_albert(1000, 10)
+
 tic()
 t = triangles(g)
 toc()

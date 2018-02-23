@@ -94,7 +94,6 @@ end
 
 
 function triangleCountingDegree(g::AbstractGraph)
-	triangleNumber = 0
 	t = zeros(Int64, nv(g))
 	dv, du, dw = 0, 0, 0
 	for v in vertices(g)
@@ -102,11 +101,11 @@ function triangleCountingDegree(g::AbstractGraph)
 		dv = degree(g, v)
 		for u in vNeighbors
 			du = degree(g, u)
-			if (dv < du || ((dv == du && v < u)))		
+			if (dv < du || ((dv == du && v < u)))
 				for w in vNeighbors
+					w >= u && break
 					dw = degree(g, w)
-					if (w < u && (dv < dw || ((dv == dw && v < w))) && has_edge(g, u, w))
-						triangleNumber = triangleNumber + 1
+					if ((dv < dw || ((dv == dw && v < w))) && has_edge(g, u, w))
 						t[v] = t[v] + 1
 						t[u] = t[u] + 1
 						t[w] = t[w] + 1
