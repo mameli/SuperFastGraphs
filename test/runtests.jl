@@ -41,6 +41,7 @@ cc1Sample = ccSample(g, 10, 1)
 @test (cc1Sample < (cc1 + 1)) & (cc1Sample > (cc1 - 1))
 
 @test (triangleCountingDegree(g) == triangles(g))
+@test (triangleForward(g) == sum(triangles(g)/3))
 
 ## TEST PREPROCESS
 gDWeakly = DiGraph(6)
