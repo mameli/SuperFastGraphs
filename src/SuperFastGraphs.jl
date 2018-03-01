@@ -7,6 +7,7 @@ export sampleDistance
 export iFub
 export ccSample
 export triangleCountingDegree
+export triangleForward
 export prunedBFS
 export preProcess
 export topKcc
@@ -92,6 +93,26 @@ function ccSample(g::AbstractGraph, k::Int64, u::Int64)
 	return ccSample
 end
 
+
+function triangleForward(g::AbstractGraph)
+	listT = Array{Array{Int}}(nv(g))
+	for i in 1:length(listT)
+		listT[i] = []
+	end
+	sortedV = sort!(collect(1:nv(g)), by = x -> -degree(g, x))
+	nTriangles = 0
+	for s in sortedV
+		vNeighbors = neighbors(g, s)
+		for t in vNeighbors
+			if degree(g, s) < degree(g, t) || (degree(g, s) == degree(g, t) && s < t)
+				nTriangles = nTriangles + length(intersect(listT[s], listT[t]))
+			else
+				push!(listT[t], s)
+			end
+		end
+	end
+	return nTriangles
+end
 
 function triangleCountingDegree(g::AbstractGraph)
 	t = zeros(Int64, nv(g))
