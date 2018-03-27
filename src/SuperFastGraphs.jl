@@ -158,12 +158,17 @@ function prunedBFS(g::AbstractGraph, v::Int64, x::Float64, preProcessData)
 		ccV = ccV + 1
 	end
 	# println("---VERTICE ", v,": ")
+	root  = true
 	while length(q)>0
 		e = dequeue!(q)
 		push!(nodeAtDepth, e)
 		visited[e] = 2 
 		neighborhood = neighbors(g, e)
 		elementsToDepthIncrease = elementsToDepthIncrease + length(neighborhood)
+		if (!is_directed(g) && root == true)
+			elementsToDepthIncrease = elementsToDepthIncrease - 1
+			root = false  
+		end 
 		timeToDepthIncrease = timeToDepthIncrease - 1
 		if timeToDepthIncrease == 0
 			n = length(vertices(g))
@@ -174,25 +179,22 @@ function prunedBFS(g::AbstractGraph, v::Int64, x::Float64, preProcessData)
 			gamma_d1 = sum(degree(g, nodeAtDepth)) - length(nodeAtDepth)
 
 			fdTildeValueAlpha = fdValue - gamma_d1 + (depth+2)*(preProcessData[2][ccV] - nodeExplored)
-			fdTildeValueOmega = fdValue - gamma_d1 + (depth+2)*(preProcessData[2][ccV] - nodeExplored)
+			fdTildeValueOmega = fdValue - gamma_d1 + (depth+2)*(preProcessData[3][ccV] - nodeExplored)
 			# println("R(V): ", preProcessData[2][ccV])
 			a = ((preProcessData[2][ccV]-1)^2) / fdTildeValueAlpha
 			b = ((preProcessData[3][ccV]-1)^2) / fdTildeValueOmega
 			bound = max( a, b ) / (n-1)
-			# println("fdValue: ",fdValue)
-			# println("n_d: ", nodeExplored)
-			# println("gamma_d1: ",gamma_d1)
-			# println("depth: ", depth)
-			# println("bound: ", bound)
-			# println("fdtilde: ",fdTildeValueAlpha, " ", fdTildeValueOmega)
-			if bound < 0
-				# println("BOUND MINORE DI ZERO BOUND MINORE DI ZERO BOUND MINORE DI ZERO BOUND MINORE DI ZERO BOUND MINORE DI ZERO ")
-			end
+			#println("fdValue: ",fdValue)
+			#println("n_d: ", nodeExplored)
+			#println("gamma_d1: ",gamma_d1)
+			#println("depth: ", depth)
+			#println("bound: ", bound)
+			#println("alpha: ", preProcessData[2][ccV]," omega: ",preProcessData[3][ccV] )
+			#println("fdtilde: ",fdTildeValueAlpha, " ", fdTildeValueOmega)
 			if (x > bound )
-				# println("v: ", v, " bound: ", bound, " NON TOPK")
+				#println("v: ", v, " bound: ", bound, " NON TOPK")
 				return 0 #il nodo non è tra i topk
 			end
-			#
 			timeToDepthIncrease = elementsToDepthIncrease
 			elementsToDepthIncrease = 0
 			depth = depth + 1
@@ -210,9 +212,9 @@ function prunedBFS(g::AbstractGraph, v::Int64, x::Float64, preProcessData)
 		end
 	end
 
-	# println("RITORNO VALORE->")
-	# println("fvalue: ", fdValue)
-	# println("rv: ", preProcessData[1][ccV])
+	#println("RITORNO VALORE->")
+	#println("fvalue: ", fdValue)
+	#println("rv: ", preProcessData[1][ccV])
 	d = dijkstra_shortest_paths(g,v).dists
 	δ = filter(x->x != typemax(x), d)
 	# println("PreProcess[1][", ccV,"]: ", preProcessData[1][ccV])
@@ -267,7 +269,7 @@ function topKcc(g::AbstractGraph, k::Int64)
 	for v in vertices(g)
 		if (degree(g, v) != 0)
 			t_xk = prunedBFS(g, v, xk, preprocessData)
-			#t_xk = prunedBFS(g, v, 0.0, preprocessData)
+			t_xk = prunedBFS(g, v, 0.0, preprocessData)
 			# println(v," --- analizzato --->", t_xk)
 			if t_xk != 0
 				if (length(topK) < k)
@@ -278,7 +280,7 @@ function topKcc(g::AbstractGraph, k::Int64)
 						xk = peek(topK)[2]
 						# println("valore di xk piu piccolo con coda piena ", xk)
 					end
-				elseif (length(topK) == k && peek(topK)[2] < t_xk)
+				elseif (length(topK) == k && peek(topK)[2] <= t_xk)
 					dequeue!(topK)
 					enqueue!(topK, v, t_xk)
 					xk = peek(topK)[2]
